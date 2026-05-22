@@ -184,10 +184,16 @@ export default function Home() {
 
       if (!blob) continue;
 
-      zip.file(
-        `${file.name.split(".")[0]}.jpg`,
-        blob
-      );
+      const originalName =
+        file.name.split(".")[0];
+
+      const cleanAspect =
+        aspect.replace(":", "x");
+
+      const exportName =
+        `${originalName}_${cleanAspect}_pixelfit.jpg`;
+
+      zip.file(exportName, blob);
 
       URL.revokeObjectURL(imageURL);
       const percent = Math.round(
