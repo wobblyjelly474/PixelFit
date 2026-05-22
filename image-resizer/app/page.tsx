@@ -18,6 +18,12 @@ export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
   const [aspect, setAspect] = useState("4:3");
   const [processing, setProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [dragging, setDragging] =
+    useState(false);
+
+  const [processedCount, setProcessedCount] =
+    useState(0);
 
   // upload type
   const [uploadType, setUploadType] = useState<
@@ -78,6 +84,23 @@ export default function Home() {
     );
   };
 
+  const handleDrop = (
+    e: React.DragEvent<HTMLDivElement>
+  ) => {
+    e.preventDefault();
+
+    setDragging(false);
+
+    const droppedFiles = Array.from(
+      e.dataTransfer.files
+    );
+
+    if (droppedFiles.length === 0) return;
+
+    setUploadType("individual");
+    setFiles(droppedFiles);
+  };
+
   const processImages = async () => {
     if (files.length === 0) return;
 
@@ -85,7 +108,8 @@ export default function Home() {
 
     const zip = new JSZip();
 
-    for (const file of files) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       const imageURL =
         URL.createObjectURL(file);
 
@@ -166,6 +190,11 @@ export default function Home() {
       );
 
       URL.revokeObjectURL(imageURL);
+      const percent = Math.round(
+        ((i + 1) / files.length) * 100
+      );
+      setProgress(percent);
+      setProcessedCount(i + 1);
     }
 
     const content =
@@ -177,14 +206,30 @@ export default function Home() {
       content,
       "resized-images.zip"
     );
-
+    
+    setProgress(0);
+    setProcessedCount(0);
     setProcessing(false);
   };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200 flex items-center justify-center p-6">
 
-      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-8 flex flex-col gap-8">
+      <div
+        className={`w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-8 flex flex-col gap-8 transition-all duration-300 ${
+        dragging
+          ? "border-4 border-blue-500 scale-[1.01]"
+          : ""
+        }`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() =>
+          setDragging(false)
+        }
+        onDrop={handleDrop}
+      >
 
         {/* Header */}
         <div className="text-center space-y-3">
@@ -198,6 +243,13 @@ export default function Home() {
             smart padding.
           </p>
         </div>
+
+        {dragging && (
+          <div className="text-center text-blue-600 font-semibold text-lg animate-pulse">
+
+            Drop images here ✨
+          </div>
+        )}
 
         {/* Upload Buttons */}
         <div className="grid md:grid-cols-2 gap-6">
@@ -378,8 +430,31 @@ export default function Home() {
             selected
           </p>
         </div>
+        {processing && (
+          <div className="w-full max-w-xl mx-auto flex flex-col gap-3">
 
-        {/* Process Button */}
+            <div className="flex justify-between text-sm text-slate-600">
+
+              <span>
+                Processing {processedCount} / {files.length}
+              </span>
+
+              <span>{progress}%</span>
+            </div>
+
+            <div className="w-full h-4 bg-slate-200 rounded-full overflow-hidden">
+
+              <div
+                className="h-full bg-blue-600 transition-all duration-300"
+                style={{
+                  width: `${progress}%`,
+                }}
+              />
+            </div>
+          </div>
+)}
+        
+              {/* Process Button */}
         <div className="flex justify-center">
 
           <button
