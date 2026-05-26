@@ -16,6 +16,10 @@ import {
 
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
+  const [originalFiles, setOriginalFiles] =
+    useState<File[]>([]);
+  const [folderName, setFolderName] =
+    useState("");
   const [aspect, setAspect] = useState("4:3");
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -73,6 +77,7 @@ export default function Home() {
     setFiles(
       Array.from(e.target.files)
     );
+    setOriginalFiles(Array.from(e.target.files));
   };
 
   const handleFolderUpload = (
@@ -85,6 +90,17 @@ export default function Home() {
     setFiles(
       Array.from(e.target.files)
     );
+    
+    const firstFile =
+      e.target.files[0];
+
+    if (firstFile.webkitRelativePath) {
+      const folder =
+        firstFile.webkitRelativePath.split("/")[0];
+
+      setFolderName(folder);
+    }
+    setOriginalFiles(Array.from(e.target.files));
   };
 
   const handleDrop = (
@@ -220,7 +236,9 @@ export default function Home() {
 
     saveAs(
       content,
-      "resized-images.zip"
+      uploadType === "folder"
+        ? `${folderName}-resized.zip`
+        : `pixelfit-${aspect.replace(":", "x")}.zip`
     );
     
     setProgress(0);
@@ -425,6 +443,21 @@ export default function Home() {
                         className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition"
                       >
                         ✕
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setFiles((prev) =>
+                            prev.map((file, i) =>
+                              i === index
+                                ? originalFiles[index]
+                                : file
+                            )
+                          );
+                        }}
+                        className="absolute top-12 right-2 z-10 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition"
+                      >
+                        ↺
                       </button>
 
                       <img
