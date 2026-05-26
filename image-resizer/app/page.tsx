@@ -551,7 +551,29 @@ export default function Home() {
               : "Process & Download ZIP"}
           </button>
         </div>
+
+        <div className="text-center text-sm text-slate-500 pt-4">
+
+          Developed by{" "}
+
+          <span className="font-semibold text-slate-700">
+            Jelly
+          </span>
+
+          {" "}•{" "}
+
+          <a
+            href="https://github.com/wobblyjelly474/PixelFit.git"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-blue-600 transition"
+          >
+           GitHub
+          </a>
+        </div>
       </div>
+
+
 
       {/* Crop Modal */}
       {editingImage && (
