@@ -98,7 +98,14 @@ export default function Home() {
     if (droppedFiles.length === 0) return;
 
     setUploadType("individual");
-    setFiles(droppedFiles);
+    const imageFiles = droppedFiles.filter((file) =>
+      file.type.startsWith("image/")
+    );
+
+    setFiles((prev) => [
+      ...prev,
+      ...imageFiles,
+    ]);
   };
 
   const processImages = async () => {
@@ -257,6 +264,10 @@ export default function Home() {
           </div>
         )}
 
+        <p className="text-sm text-slate-500 text-center">
+          Drag and drop images here or use the upload buttons below.(folders via Upload Folder)
+        </p>
+
         {/* Upload Buttons */}
         <div className="grid md:grid-cols-2 gap-6">
 
@@ -402,6 +413,17 @@ export default function Home() {
                       className="relative group rounded-2xl overflow-hidden bg-slate-100"
                     >
 
+                      <button
+                        onClick={() => {
+                          setFiles((prev) =>
+                            prev.filter((_, i) => i !== index)
+                          );
+                        }}
+                        className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition"
+                      >
+                        ✕
+                      </button>
+
                       <img
                         src={preview}
                         alt={file.name}
@@ -427,6 +449,24 @@ export default function Home() {
           )}
 
         {/* File Count */}
+        
+        {files.length > 0 && (
+          <div className="flex justify-center">
+            <button
+              onClick={() => {
+                setFiles([]);
+                setProgress(0);
+                setProcessedCount(0);
+                setUploadType(null);
+              }}
+              className="px-6 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold transition"
+            >
+              Clear All
+            </button>
+          </div>
+)}
+
+
         <div className="flex items-center justify-center gap-3 text-slate-600">
 
           <ImageIcon className="w-5 h-5" />
