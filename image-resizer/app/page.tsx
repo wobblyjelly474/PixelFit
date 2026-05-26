@@ -40,6 +40,9 @@ export default function Home() {
   const [editingImage, setEditingImage] =
     useState<string | null>(null);
 
+  const [editingIndex, setEditingIndex] =
+    useState<number | null>(null);
+
   const [crop, setCrop] = useState({
     x: 0,
     y: 0,
@@ -431,11 +434,10 @@ export default function Home() {
                       />
 
                       <button
-                        onClick={() =>
-                          setEditingImage(
-                            preview
-                          )
-                        }
+                        onClick={() => {
+                          setEditingImage(preview);
+                          setEditingIndex(index);
+                        }}
                         className="absolute bottom-3 right-3 bg-black/70 text-white p-2 rounded-xl opacity-0 group-hover:opacity-100 transition"
                       >
 
@@ -619,13 +621,18 @@ export default function Home() {
                       }
                     );
 
-                  setFiles([
-                    croppedFile,
-                  ]);
+                  setFiles((prev) =>
+                    prev.map((file, i) =>
+                      i === editingIndex
+                        ? croppedFile
+                        : file
+                    )
+                  );
 
                   setEditingImage(
                     null
                   );
+                  setEditingIndex(null);
                 }}
                 className="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold"
               >
